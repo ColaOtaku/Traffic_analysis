@@ -141,7 +141,7 @@ JsonPath
 
 #### 2020.6.15
 
-git usage
+##### git usage
 
 **git add**
 
@@ -198,7 +198,9 @@ git push
 
 
 
-#### oracle 数据库
+#### 2020.6.16
+
+##### oracle 数据库
 
 **层次逻辑：**
 
@@ -259,3 +261,98 @@ alter user UsrName identified by PassWord；
 imp UsrName/PassWord file=path\filename full=y ignore=y;
 ```
 
+
+
+**SELECT相关SQL语句**
+
+查询某张表下所有字段的名字
+
+```SQL
+SELECT * FROM user_col_comments where Table_Name = 'TableName'
+```
+
+查询用户下所有表的名字
+
+```sql
+select * from user_tab_comments;
+```
+
+
+
+##### python编程(函数对象，匿名函数)
+
+**函数对象：**
+
+```python
+def func1():
+	pass
+def fun2():
+	pass
+funclist=[func1,func2]
+for fun in funclist
+	pirnt(fun())
+```
+
+**匿名函数：**
+
+```python
+lambda x: x**2
+```
+
+
+
+#### 6.19
+
+##### Pandas相关
+
+重置index
+
+```python
+df.reset_index(drop=True)
+```
+
+
+
+#### 6.20
+
+##### Paper: Origin-Destination Matrix Prediction via Graph Convolution: a New Perspective of Passenger Demand Modeling
+
+如何表现OD？ OD应当是一段时间的特征，如何表现一个时刻的
+
+**ODMP特点：**
+
+（1）需要同时预测需求和目的地
+
+（2）矩阵**极其稀疏**
+
+（3）考虑**时间和空间**两部分的**融合预测**
+
+
+
+**GEML 模型：**
+
+​	分为时域的Multi-task Learning部分(含感知稀疏性以及数据范围的聚合器)
+
+​			空间域的Grid-Embedding 部分
+
+稀疏性的解决方法：
+
+​			扩散，邻近原则:某栅格受到邻近栅格的影响，且越近的栅格，影响越大。考虑两种邻近关系：
+
+​	Geographical & Semantic Neighbors
+
+​	前者为物理意义上的邻近，后者为OD对意义上的邻近
+
+![image-20200621220852519](Note.assets/image-20200621220852519.png)
+
+**Solution**
+
+![image-20200621220802329](Note.assets/image-20200621220802329.png)
+
+​			
+
+##### GCN
+
+
+
+**LSTM**
