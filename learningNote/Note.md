@@ -313,7 +313,7 @@ df.reset_index(drop=True)
 
 
 
-#### 6.20
+#### 6.21、6.22
 
 ##### Paper: Origin-Destination Matrix Prediction via Graph Convolution: a New Perspective of Passenger Demand Modeling
 
@@ -351,8 +351,82 @@ df.reset_index(drop=True)
 
 ​			
 
-##### GCN
+##### GCN(transductive)
 
+​		GCN研究特征（Feature）和消息（Message）在Graph Network中流动和传播。这个传播最原始的形态就是状态的变化正比于相应空间二阶微分作用在当前的状态（邻节点对当前节点的作用）。在二维离散空间上，二阶微分对应为拉普拉斯算子$$\Delta$$,在图空间中，对应为拉普拉斯矩阵$$L$$
 
+**Graph Convolution**
 
-**LSTM**
+​	在**Euclidean Structure**的结构中，可以利用卷积提取，在图空间中，可以将卷积和傅里叶变换推广，其中拉普拉斯算子和拉普拉斯矩阵地位等价，由此可以推广，如基函数$$e^{-i\omega t}$$ 对应拉普拉斯矩阵的特征向量。通过矩阵分解拉普拉斯矩阵有：
+
+<img src="Note.assets/image-20200622153332090.png" alt="image-20200622153332090" style="zoom: 33%;" />
+
+​		U为单位特征向量构成的矩阵$$\lambda$$ 为对应特征向量的特征值
+
+<img src="Note.assets/image-20200622152224581.png" alt="image-20200622152224581" style="zoom: 33%;" />
+$$
+y=(x*h)_G=U\hat{h}(\Lambda)U^Tx
+$$
+**GCN：**
+
+​		GCN的每一层之间都是一次卷积计算，每一层之间都是共享参数，局部感受野
+
+​		**二代卷积核**
+$$
+\hat{h}(\lambda_l)=\sum_{j=0}^K\alpha_j\lambda^j_l
+$$
+​		这样设计的好处是可以不用去算特征值，在运算过程中自然归到拉普拉斯矩阵当中：
+$$
+y=\sigma(\sum_{j=0}^{K-1}\alpha_j L^j x)
+$$
+​		$$\alpha$$ 为训练参数，$$K$$即为感知野
+
+​		**三代卷积核**
+
+​			通过切比雪夫近似，卷积运算近似为：
+$$
+\hat h(\Lambda)=\sum_{k=0}^{K-1}\beta_kT_k(\hat \Lambda)
+$$
+​			其中，$$T_k()$$ 是 $$k$$ 阶的Chebyshev多项式，$$\beta_k$$是训练参数。$$\hat \Lambda$$ 是re-scaled（[-1,1]）的特征值对角矩阵（$$\hat \Lambda=2\Lambda/\lambda_{max}-I$$）$$\lambda_{max}$$用幂迭代法。
+
+​			那么有：
+$$
+y=\sigma(\sum_{k=0}^{K-1}\beta_k T_k(\hat L) x)
+$$
+​			其中$$\hat L=2L/\lambda_{max}-I$$,$$K$$即为感知野，一般可以取2，即两层neibour，并近似$$\lambda_{max}=2$$（graph Laplacian性质）：
+$$
+y\approx \sigma(\beta_0 H^l+\beta_1(L-I)x)
+$$
+​			定义对称归一化拉普拉斯矩阵$$L^{sys}$$：
+$$
+L^{sym}=D^{-1/2}LD^{-1/2}=I-D^{-1/2}AD^{-1/2}
+$$
+​			有(取$$\beta=\beta_0=-\beta_1$$)
+$$
+y\approx\sigma(\beta_0 x-\beta_1D^{-1/2}AD^{-1/2}x)=\sigma(\beta(I+D^{-1/2}AD^{-1/2})x)
+$$
+​			原论文中提到此时$$I+D^{-1/2}AD^{1/2}$$的特征值在[0,1]之间，层之间的迭代可能导致numerical instabilities、exploding/vanishing gradients，提到**renormalization trick**
+$$
+I+D^{-1/2}AD^{-1/2}\rightarrow \hat D^{-1/2}\hat A\hat D^{-1/2}\\
+\hat A=A+I \space \&\hat D_{ii}=\sum_j \hat{A}_{ij}
+$$
+
+$$
+y\approx\sigma(\beta\hat D^{-1/2}\hat A\hat D^{-1/2}x)
+$$
+
+​			最终，对于整层来说有
+$$
+H^{l+1}\approx\sigma(\hat D^{-1/2}\hat A\hat D^{-1/2}H^lW(l))=\sigma(\tilde{A}H^lW(l))
+$$
+​			$$\tilde{A}$$:  n*n  (n为节点数)
+
+​			$$W(l)$$： 
+
+​		注：1.DL中卷积与数学上的卷积意义稍有不同，本质为可**训练的共享参数的卷积核**
+
+​				2.GCN适用于无向图，因为拉普拉斯矩阵一定可以分解是建立在其是半正定的基础上的（无向图实对称），有向图考虑node-wise，如GraphSage、GAT
+
+##### GraphSage(inductive)
+
+##### LSTM
