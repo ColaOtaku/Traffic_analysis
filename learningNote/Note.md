@@ -421,7 +421,9 @@ H^{l+1}\approx\sigma(\hat D^{-1/2}\hat A\hat D^{-1/2}H^lW(l))=\sigma(\tilde{A}H^
 $$
 ​			$$\tilde{A}$$:  n*n  (n为节点数)
 
-​			$$W(l)$$： 
+​			$$H$$: n*m  (m为特征维度)
+
+​			$$W$$：m*u (u为神经网络层单元数) 
 
 ​		注：1.DL中卷积与数学上的卷积意义稍有不同，本质为可**训练的共享参数的卷积核**
 
@@ -429,4 +431,50 @@ $$
 
 ##### GraphSage(inductive)
 
+<img src="Note.assets/image-20200622224951592.png" alt="image-20200622224951592" style="zoom: 67%;" />
+
+​			训练K个aggregator,进行K次聚合，每次聚合：
+
+​		（1）将节点一阶邻近节点的K-1次embedding送入aggreator得到聚合特征
+
+​		（2）contact聚合特征与节点上一次embedding得到本次embedding
+
+ 		**常见聚合函数：**
+
+​		1.平均聚合
+
+<img src="Note.assets/image-20200622231131770.png" alt="image-20200622231131770" style="zoom:50%;" />
+
+​		2.融合聚合
+
+<img src="Note.assets/image-20200622231153905.png" alt="image-20200622231153905" style="zoom:50%;" />
+
 ##### LSTM
+
+​		长短期记忆网络是一种特殊的RNN，单个cell中有四个网络层交互
+
+![image-20200623094944478](Note.assets/image-20200623094944478.png)
+
+<img src="Note.assets/image-20200623095051384.png" alt="image-20200623095051384" style="zoom:50%;" />
+
+LSTM中存在两个信息流，**c&h**：
+
+​			**c(cell state)** 改变的很慢，对应较长且稳定的短时记忆，在单个cell中的运算是**forget & update**
+
+![image-20200623100300201](Note.assets/image-20200623100300201.png)
+
+​		forget 依靠sigmod（forget）的门控作用实现，以此过滤掉不重要的信息，update由sigmod（in）以及tanh组成，前者过滤需要更新的值，后者产生待更新的值
+
+
+
+​		**h(hidden state)**则可能变化的很快，对应短时记忆，在单个cell中的运算与update类似，通过sigmoid（out）门控作用筛选出需要传递(用作下一次运算的前馈信息)与输出的信息，具体信息来自于c。其中的输出$$h_t$$是我们真正需要的内容
+
+![image-20200623101828428](Note.assets/image-20200623101828428.png)
+
+
+
+**注：** 1.激活函数，sigmod映射到【0，1】符合门控的物理意义，tanh映射到【-1，1】有良好的性质，解决梯度弥散问题，能较快收敛		
+
+​		 2.具体维度变化：
+
+![image-20200623102456834](Note.assets/image-20200623102456834.png)
