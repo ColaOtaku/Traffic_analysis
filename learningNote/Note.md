@@ -216,6 +216,15 @@ git push
 
 <img src="Note.assets/image-20200616144951926.png" style="zoom:67%;" />
 
+**命令行启动相关：**
+
+```
+lsnrctl status
+# 启动服务
+sqlplus
+# 登录选项
+```
+
 **结构相关SQL语句**
 
 创建表空间
