@@ -487,3 +487,366 @@ LSTM中存在两个信息流，**c&h**：
 ​		 2.具体维度变化：
 
 ![image-20200623102456834](Note.assets/image-20200623102456834.png)
+
+
+
+#### 6.28 
+
+##### Pytorch
+
+```python
+import torch	
+```
+
+**张量 tensor：**
+
+```python
+#创建
+torch.tensor([3,5])
+torch.randn(4,4)
+torch.ones(5)
+
+#维度改变
+torch.view(16)
+torch.view(-1,4) #-1表示给定维度以外的
+
+#定义在不同域
+torch.cuda.is_available()
+
+device=torch.device("cuda")
+var = var.to(device,torch.double)
+```
+
+**向量求导：**
+$$
+Y=f(X)\\
+\frac{dY}{dX}=\begin{vmatrix} \frac{\partial y_1}{\partial x_1} &\frac{\partial y_1}{\partial x_2} &... &\frac{\partial y_1}{\partial x_n} \\\frac{\partial y_2}{\partial x_1} &\frac{\partial y_2}{\partial x_2} &... &\frac{\partial y_2}{\partial x_n}\\... &...&...&...\\\frac{\partial y_m}{\partial x_1} &\frac{\partial y_m}{\partial x_2} &... &\frac{\partial y_m}{\partial x_n}\end{vmatrix}
+$$
+**梯度计算 autograd：**
+
+
+
+​		张量 `tensor`是梯度计算的主体。
+
+属性：
+
+​	`.requires_grad` ：当设置为True时，开始追踪在该变量上的所有操作
+
+​	 `.grad` ：储存 `.backward()`的计算结果
+
+​    `.grad_fn`：储存创建了这个变量的 `Function` ,对于直接创建的变量，属性为`None`
+
+方法：
+
+​	 `.backward()`：自动计算所有的梯度对于向量需要指定投影权重,实际上计算的是vector-Jacobian product
+
+```
+y=f(x)
+v = torch.tensor(vector, dtype=torch.float)
+y.backward(v)  # v' * J
+```
+
+ 	`.detach()`：分离出计算的历史，可以停止一个 tensor 变量继续追踪其历史信息 ，同时也防止未来的计算会被追踪。
+
+​	 `.requires_grad_(True)` ：设置一个存在的变量追踪计算
+
+
+
+**神经网络：**
+
+​	**Sample:**
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class Net(nn.Module):
+
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+
+        self.fc1 = nn.Linear(16*5*5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
+        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+        x = x.view(-1, self.num_flat_features(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+    def num_flat_features(self, x):
+        size = x.size()[1:]
+        num_features = 1
+        for s in size:
+            num_features *= s
+        return num_features
+
+net = Net()
+```
+
+![image-20200628222102995](Note.assets/image-20200628222102995.png)
+
+**卷积层：**
+
+```python
+#prototype
+nn.Conv1d(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True)
+nn.Conv2d(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True)
+
+#sample
+#input 32*32*1 灰度图片
+self.conv1 = nn.Conv2d(1, 6, 5) 
+#使用6个大小为5 x 5的卷积核，故卷积核的规模为1 x （5 x 5) x 6；卷积操作的stride参数默认值为1 x 1，32 - 5 + 1 = 28，并且使用ReLU对第一次卷积后的结果进行非线性处理，输出大小为28 x 28 x 6；
+
+self.conv2 = nn.Conv2d(6, 16, 5)  
+#用16个卷积核，故卷积核的规模为6 x (5 x 5 ) x 16；使用ReLU对第二次卷积后的结果进行非线性处理，14 - 5 + 1 = 10，故输出大小为10 x 10 x 16；
+```
+
+
+
+**全连接层：**
+
+```python
+#prototype
+class torch.nn.Linear(in_features，out_features，bias = True)
+
+#sample
+ self.fc1 = nn.Linear(16*5*5, 120)
+#上一步得到的结果铺平成一维向量形式，5 x 5 x 16 = 400，即输入大小为400 x 1，W大小为120 x 400，输出大小为120 x 1
+ self.fc2 = nn.Linear(120, 84)
+#W大小为84 x 120，输入大小为120 x 1，输出大小为84 x 1
+ self.fc3 = nn.Linear(84, 10)
+#W大小为10 x 84，输入大小为84 x 1，输出大小为10 x 1
+```
+
+
+
+**前向传播：**
+
+​		 `forward` 函数必须实现，而 `backward` 函数在采用 `autograd` 时就自动定义好了，在 `forward` 方法可以采用任何的张量操作。
+
+```python
+#prototype
+nn.MaxPool2d(kernel_size, stride=None, padding=0, dilation=1, return_indices=False, ceil_mode=False)
+default stride = kernel_size
+
+#sample
+def forward(self, x):
+	x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
+	x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+	x = x.view(-1, self.num_flat_features(x))
+	x = F.relu(self.fc1(x))
+	x = F.relu(self.fc2(x))
+	x = self.fc3(x)
+ 	return x
+ 	
+def num_flat_features(self, x):
+    size = x.size()[1:]
+    num_features = 1
+    for s in size:
+        num_features *= s
+    return num_features
+```
+
+
+
+**网络调试：**
+
+```python
+#sample
+params = list(net.parameters())
+print('参数数量: ', len(params))
+# conv1.weight
+print('第一个参数大小: ', params[0].size())
+```
+
+
+
+ **损失函数&优化器**
+
+```python 
+#sample
+import torch.optim as optim
+criterion = nn.MSELoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+#criterion = nn.CrossEntropyLoss()
+#loss = criterion(output, target)
+# output target 同size
+```
+
+
+
+**训练网络：**
+
+```python
+import time
+net.to(device)
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+criterion = nn.MSELoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+start = time.time()
+for epoch in range(epoch_size):
+
+    running_loss = 0.0
+    for i, data in enumerate(trainset, 0): # each batch
+        
+	#1.获取输入数据
+        inputs, labels = data
+  		inputs, labels = inputs.to(device), labels.to(device)
+	#2.前向传播，获取网络输出
+        outputs = net(inputs)
+        
+    #3.计算loss    
+        loss = criterion(outputs, labels)
+    
+    #4.反向传播，更新权重
+        loss.backward()
+        optimizer.zero_grad()
+        optimizer.step()
+
+        running_loss += loss.item()
+        #if i % 2000 == 1999:
+        #    每 2000 次迭代打印一次信息
+        #    print('[%d, %5d] loss: %.3f' % (epoch + 1, i+1, running_loss / 2000))
+        #    running_loss = 0.0
+print('Finished Training! Total cost time: ', time.time()-start)
+with torch.no_grad():
+    ...
+```
+
+
+
+**并行计算：**
+
+```python
+#check if GPU is available
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+#check the nums of GPU
+torch.cuda.device_count()
+#Turn to parallel
+model = nn.DataParallel(model)
+```
+
+
+
+`torch.nn` 只支持**小批量(mini-batches)**数据，也就是输入不能是单个样本，比如对于 `nn.Conv2d` 接收的输入是一个 4 维张量--`nSamples * nChannels * Height * Width` 。
+所以，如果你输入的是单个样本，**需要采用** `input.unsqueeze(0)` **来扩充一个假的 batch 维度，即从 3 维变为 4 维**。
+
+```python
+#sample
+input = torch.randn(1, 1, 32, 32)
+out = net(input)
+```
+
+
+
+#### 6.29
+
+##### pytorch LSTM
+
+**Data Form:**
+
+​	3维Tensors（seq_len，batch_size,input_size）：
+
+​	seq_len: 序列长度
+
+​	batch_size：batch 个数
+
+​	input_size：特征数量
+
+对于(batch,seq_len,feature_nums)的数据，一般用以下方式转变：
+
+```python
+import torch
+import numpy as np
+
+data=np.random.randn(2,3,3)  # batch=2, seq_len=3, feature=3
+data=torch.from_numpy(data)
+lstm_data=data.permute(1,0,2) # seq_len=3, batch=2, feature=3
+```
+
+
+
+**LSTM FORM：**
+
+**class torch.nn.LSTM(args, kwargs)**
+
+**输入参数：**
+
+INPUT:
+
+​		input_size：x的特征维度
+​		hidden_size：隐藏层的特征维度
+​		num_layers：lstm隐层的层数，默认为1
+​		bias：False则bih=0和bhh=0. 默认为True
+​		batch_first：True则输入输出的数据格式为 (batch, seq, feature)
+​		dropout：除最后一层，每一层的输出都进行dropout，默认为: 0
+​		bidirectional：True则为双向lstm默认为False
+
+(h0,c0): optional
+
+​		h0(num_layers * num_directions, batch, hidden_size) tensor
+
+​		c0(num_layers * num_directions, batch, hidden_size) tensor
+
+​		可给定初始值
+
+**输出结果：**
+
+OUTPUT:
+
+​	(seq_len, batch, num_directions*hidden_size） tensor
+
+(hn,cn):
+
+​		hn(num_layers * seq_len, batch, hidden_size)
+
+​		cn(num_layers * seq_len, batch, hidden_size)
+
+​		t=seq_len 的网络参数
+
+```python
+#sample
+class LstmRNN(nn.Module):
+
+    def __init__(self, input_size, hidden_size=1, output_size=1, num_layers=1):
+        super().__init__()
+ 
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers) 
+        self.output_layer = nn.Linear(hidden_size, output_size)
+ 
+    def forward(self, _x):
+        x, _ = self.lstm(_x)  # _x input, (seq_len, batch, input_size)
+        s, b, h = x.shape  # x output, (seq_len, batch, hidden_size)
+        x = x.view(s*b, h)
+        x = self.output_layer(x)
+        x = x.view(s, b, -1) # net_output. seq_len,batch,output_size
+        return x
+```
+
+```python
+ loss_function = nn.MSELoss()
+ optimizer = torch.optim.Adam(lstm_model.parameters(), lr=1e-2)
+ 
+ max_epochs = 10000
+ for epoch in range(max_epochs):
+        output = lstm_model(train_x)
+        loss = loss_function(output, train_y)
+ 
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+ 
+        if loss.item() < 1e-4:
+            break
+```
+
+
