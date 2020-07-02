@@ -507,8 +507,8 @@ torch.randn(4,4)
 torch.ones(5)
 
 #维度改变
-torch.view(16)
-torch.view(-1,4) #-1表示给定维度以外的
+tensor.view(16)
+tensor.view(-1,4) #-1表示给定维度以外的 shape 
 
 #定义在不同域
 torch.cuda.is_available()
@@ -538,7 +538,9 @@ $$
 
 方法：
 
-​	 `.backward()`：自动计算所有的梯度对于向量需要指定投影权重,实际上计算的是vector-Jacobian product
+​	 `.backward()`：自动计算所有的梯度对于向量需要指定投影权重,实际上计算的是vector-Jacobian product 
+
+​			**why ?**
 
 ```
 y=f(x)
@@ -696,7 +698,8 @@ start = time.time()
 for epoch in range(epoch_size):
 
     running_loss = 0.0
-    for i, data in enumerate(trainset, 0): # each batch
+    
+    for i, data in enumerate(trainset): # each batch
         
 	#1.获取输入数据
         inputs, labels = data
@@ -718,7 +721,10 @@ for epoch in range(epoch_size):
         #    print('[%d, %5d] loss: %.3f' % (epoch + 1, i+1, running_loss / 2000))
         #    running_loss = 0.0
 print('Finished Training! Total cost time: ', time.time()-start)
+
+
 with torch.no_grad():
+   outputs = net(inputs)
     ...
 ```
 
