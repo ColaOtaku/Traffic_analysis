@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+  <title>绘制交通图</title>
+  	<link rel="stylesheet" href="css/style.css"/>
+
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=8d38bf687af8dec3cf43127cfb19740f"></script>
+	<script src="https://webapi.amap.com/loca?v=1.2.0&key=38bdf9c24464c03f64f733752feecc05"></script>
+	<script src="js/listd.js"></script>
+	<script src="js/list.js"></script>
+	<script src="https://a.amap.com/Loca/static/dist/jquery.min.js"></script>
+	<script src="js/scrollbar.js"></script>
+</head>
+<body>
+	
+   <div id="container"></div>
+	 <script src="js/map.js"></script>
+
+   <div class="progressTime" id="progressTime" style="z-index:9">
+    <div style="margin-top:-12px">
+	   <p id="startTime">2020-03-09 09:40:00</p>
+       <p  id="endTime">2020-03-09 00:00:00</p>
+    </div>
+    <div id="progressTime_concent">
+        <div id="scrollBar">
+          <div style="width: 166px;" id="scroll_Track"></div>
+          <div  id="scroll_Thumb"></div>
+        </div>
+        <div style="width:90%; margin-left: auto;margin-right: auto;">
+          <p style="float:right" id="scrollBarTxt"></p>
+        </div>
+      </div>
+  </div> 
+
+</body>
+</html>

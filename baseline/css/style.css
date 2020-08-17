@@ -1,0 +1,110 @@
+    html,
+    body,
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+.progressTime {
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.8;
+    position: absolute;
+    _position: fixed;
+    left: 0;
+    bottom: 0px;
+    z-index: 2;
+    border: 1px solid gray;
+    -moz-border-radius: 5px;
+    color: white;
+    background: #000;
+    width: 100%;
+    height: 83px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    display: none;
+}
+#progressTime_concent {
+    width: 100%;
+    position: relative;
+    height: 68px;
+    margin: 0 auto;
+    margin-top: 10px;
+}
+#scrollBar {
+    width: 97%;
+    height: 18px;
+    cursor: pointer;
+    background-color: #ccc;
+    margin: 0 auto;
+    margin-top: 51px;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+    cursor: pointer;
+}
+#scroll_Track {
+    width: 0px;
+    height: 18px;
+    background-color: #0072ff;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+}
+#scroll_Thumb {
+    height: 20px;
+    width: 20px;
+    background-color: #efefef;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: 0px 0px 5px #ccc;
+    -moz-box-shadow: 0px 0px 5px #ccc;
+    box-shadow: 0px 0px 5px #ccc;
+    position: absolute;
+    margin-top: -20px;
+    cursor: pointer;
+}
+#scroll_Thumb:hover {
+    background-color: #0877ff;
+    border: 1px solid #fff;
+}
+#scrollBarTxt {
+    position: absolute;
+    bottom: 62px;
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -o-transform: translateX(-50%);
+    transform: translateX(-50%);
+    width: 150px;
+    font-size: 12px;
+    line-height: 24px;
+    color: #000;
+    background-color: rgba(255, 255, 255, 0.7);
+    font-weIght: 600;
+    text-align: center;
+    border-radius: 5px;
+    display: none;
+}
+#scrollBarTxt::after {
+    content: '';
+    position: absolute;
+    left: 83px;
+    top: 100%;
+    border-top: 8px solid #fff;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    opacity: 0.7;
+}
+#startTime {
+    float: left;
+    margin-left: 4px;
+    margin-top: 69px;
+}
+#endTime {
+    float: right;
+    margin-top: 69px;
+    margin-right: 12px
+}

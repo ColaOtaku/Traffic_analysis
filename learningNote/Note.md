@@ -856,3 +856,75 @@ class LstmRNN(nn.Module):
 ```
 
 
+
+#### 7.7
+
+Target:
+
+（1） OD 预测
+
+ 1. 尝试 embedding-grid _ graphsage
+
+ 2. 扩充数据
+
+（2）稀疏采样数据得到大量数据的效果
+
+（3）个人数据点扩充
+
+​	1.个人数据拥有车载GPS信息
+
+​	2.出租车数据清洗，计算速度 
+
+
+
+#### 7.14
+
+##### Map-Matching for Low-Sampling-Rate GPS Trajectories
+
+应用场景：低采样GPS轨迹戳
+
+算法：ST-Matching [spatial-temporal | topological  structure ]
+
+领域基础算法：Incremental matching algorithm
+
+​							global matching algorithm
+
+​							
+
+
+
+
+
+#### 7.24
+
+**Falco: Fast likelihood‐based collision avoidance with**
+**extension to human‐guided navigation**
+
+为了减少计算量，将导航问题划分为两个分离的问题：
+
+1. 全局路径规划问题（启发式）避免全局最小
+2. 局部路径规划，以跟踪全局路径并避障
+
+​        减少计算复杂度的关键在于用似然地图替代实时更新的全局地图，同时并非搜索最小成本路径，而是寻找使得抵达规划终点可能性最大的路径。同时作者认为最短路径搜索会导致规划难以通行或者难以避开动态障碍物，而最大似然搜素可能搜索到更容易通行的路径。
+
+​		**Fancy Point**:  允许外部输入，算法轨迹规划时会考虑外部输入
+
+
+
+**Probalistic model**
+
+![image-20200724130057828](Note.assets/image-20200724130057828.png)
+
+![image-20200724130104658](Note.assets/image-20200724130104658.png)
+
+其中$$\xi_i$$ 依据 $$p(x_f|x_s)$$ 采样 
+
+**local probability**
+
+![image-20200724130815557](Note.assets/image-20200724130815557.png)
+
+![image-20200724131611201](Note.assets/image-20200724131611201.png)
+
+![image-20200724131620501](Note.assets/image-20200724131620501.png)
+
+![image-20200724131631731](Note.assets/image-20200724131631731.png)
