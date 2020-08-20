@@ -31,7 +31,7 @@
 		 Taxi = new Loca.LineLayer({
 				map: amap
 			});
-			Taxi.setData(GaoGPS,{
+			Taxi.setData(test['polys'],{
 						lnglat: function(data){
 							return  data.value;
 				}
