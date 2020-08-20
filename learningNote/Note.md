@@ -928,3 +928,34 @@ Target:
 ![image-20200724131620501](Note.assets/image-20200724131620501.png)
 
 ![image-20200724131631731](Note.assets/image-20200724131631731.png)
+
+#### JS
+
+```javascript
+Taxi.setData(data_t[0]['polys'], {
+	lnglat: function(data){
+			item= data.value
+			console.log(1)
+			AMap.convertFrom(item, 'gps', function (status, result) {
+									console.log(2)
+									if (result.info === 'ok') {
+													item =result.locations;
+													console.log(4)}
+													});
+			console.log(3)
+			return item;
+			}
+});
+```
+
+神奇的表现为，输出为 1，3，1，3，1，3，1，3，2，4，2，4，2，4
+
+
+
+js 不支持多线程，但是引入了异步的特性，并用回调来实现更加复杂的功能。
+
+![image-20200820190844598](Note.assets/image-20200820190844598.png)
+
+​	在异步执行的模式下，每一个异步的任务都有其自己一个或着多个回调函数，这样当前在执行的异步任务执行完之后，不会马上执行事件队列中的下一项任务，而是执行它的回调函数，而下一项任务也不会等当前这个回调函数执行完，因为它也不能确定当前的回调合适执行完毕，只要引它被触发就会执行
+
+**js接口的函数是异步返回**
