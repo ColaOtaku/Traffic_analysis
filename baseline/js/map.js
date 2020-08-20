@@ -1,4 +1,4 @@
-/*地图绘制部分*/		
+/*地图绘制部分*/
 	var amap = new AMap.Map('container', {
 		mapStyle: 'amap://styles/midnight',
         resizeEnable: true,
@@ -6,41 +6,53 @@
 		viewMode: '2D',
         zoom: 13
     });
-	
+
 	var loaded = false;
 
     function createVisualMap() {
-		if (loaded) return;
-        loaded = true;
-		var map = Loca.create(amap);
+			if (loaded) return;
+	        loaded = true;
 
-		layer = Loca.visualLayer({
-			container: map,
-			type: 'line',
-			shape: 'line',
-		});
-
-        layer.setData(data, {
-            lnglat: function(data){
-					var item = data.value;
-					return item.polylines;
-			}
-        });
-
-        layer.setOptions({
-            style: {
-                borderWidth: 3,
-                opacity: 0.4,
-                color: '#ffffff'
+			Suplayer = new Loca.LineLayer({
+				map: amap
+			});
+	    Suplayer.setData(superior, {
+	            lnglat: function(data){
+						var item = data.value;
+						return item.polylines;
 				}
-        });
-		
-        layer.render();
+	        });
+	    Suplayer.setOptions({
+	            style: {
+	                borderWidth: 3,
+	                opacity: 0.4,
+	                color: '#ffffff'
+					}
+	        });
+	    Suplayer.render();
+
+			Inflayer = new Loca.LineLayer({
+				map: amap
+			});
+			Inflayer.setData(inferior, {
+									lnglat: function(data){
+								var item = data.value;
+								return item.polylines;
+						}
+							});
+			Inflayer.setOptions({
+									style: {
+											borderWidth: 3,
+											opacity: 0.4,
+											color: '#ffffff'
+							}
+							});
 	}
+
 	createVisualMap();
-	
+
 	function alterSpeed(time) {
-		layer.setOptions({
+		Suplayer.setOptions({
             style: {
                 borderWidth: 3,
                 opacity: 0.4,
@@ -49,30 +61,60 @@
 					var timelist = item.time;
 					var speedlist = item.speed;
 					var counts = item.speed_count;
-					if (counts==-1) 
+					if (counts==-1)
 						return'#ffffff';
 					for(var i =0;i<timelist.length;i++){
 						if (Math.abs(Date.parse(time)-Date.parse(timelist[i]))<600000)
 							return speedlist[i];
-						if(Date.parse(timelist[i])-Date.parse(time)>600000) 
+						if(Date.parse(timelist[i])-Date.parse(time)>600000)
 							break;
 					}
 					return '#ffffff';
 				}
             }
         });
-		 layer.render();
+		Suplayer.render();
+
+		Inflayer.setOptions({
+						 style: {
+								 borderWidth: 3,
+								 opacity: 0.4,
+								 color: function(data){
+					 var item = data.value;
+					 var timelist = item.time;
+					 var speedlist = item.speed;
+					 var counts = item.speed_count;
+					 if (counts==-1)
+						 return'#ffffff';
+					 for(var i =0;i<timelist.length;i++){
+						 if (Math.abs(Date.parse(time)-Date.parse(timelist[i]))<600000)
+							 return speedlist[i];
+						 if(Date.parse(timelist[i])-Date.parse(time)>600000)
+							 break;
+					 }
+					 return '#ffffff';
+				 }
+						 }
+				 });
+
 	}
 
 //预留
-/*
+	record = 13;
 	var logMapinfo = function (){
-	
-	  console.log("resize")
+		if(amap.getZoom()>14 && record <=14)
+			Inflayer.render();
+
+		if (amap.getZoom()<=14 &&record > 14)
+			Inflayer.hide();
+
+		record = amap.getZoom();
+
+	  console.log(amap.getZoom())
     };
-	
+
 	amap.on('zoomchange', logMapinfo);
-*/
+
 /*滑槽部分*/
  $(document).ready(function (e) {
             SetProgressTime(null, "2020-03-09 00:00:00", "2020-03-09 09:40:00")
@@ -82,11 +124,11 @@
         function SetProgressTime(fun, startTime, endTime) {
             myfun = fun;
 			/*根据文本修改显示项*/
-            $("#progressTime").show();	
+            $("#progressTime").show();
             $("#scrollBarTxt").html(startTime);
             $("#startTime").text(startTime);
             $("#endTime").text(endTime);
-			
+
             //设置最大值
             var qdsjDate = new Date(startTime)
             var jssjDate = new Date(endTime)
@@ -246,4 +288,4 @@
                 ScrollBar.value = Math.round(currentValue * ScrollBar.maxValue / $("#scrollBar").width());
             }
             SetTime(type,ScrollBar.value,currentValue);
-        }	
+        }
